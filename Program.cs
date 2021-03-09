@@ -5,6 +5,7 @@ using System.IO.Compression;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace Peek.Tab
 {
@@ -61,6 +62,7 @@ namespace Peek.Tab
                         .ToLookup(o => o.RegionID, o => o.RegionName);
 
                     SHA1 sha1 = SHA1.Create();
+                    Regex yearReg = new Regex("([0-9]{4})");
 
                     foreach (var file in new DirectoryInfo(romsPath).GetFiles())
                     {
@@ -119,8 +121,12 @@ namespace Peek.Tab
                         }
 
                         string year = "";
-                        if (release.ReleaseDate != null && release.ReleaseDate.Length >= 4)
-                            year = release.ReleaseDate.Substring(release.ReleaseDate.Length - 4);
+                        if (release.ReleaseDate != null)
+                        {
+                            var match = yearReg.Match(release.ReleaseDate);
+                            if (match.Success)
+                                year = match.Groups[1].Value;
+                        }
 
                         string genre = "";
                         if (release.ReleaseGenre != null)
