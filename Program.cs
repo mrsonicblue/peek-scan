@@ -44,7 +44,7 @@ namespace Peek.Tab
 
             Console.WriteLine("Opening output file...");
 
-            using (var outputStream = File.OpenWrite(outputPath))
+            using (var outputStream = File.Open(outputPath, FileMode.Truncate))
             using (var writer = new StreamWriter(outputStream, Encoding.ASCII))
             {
                 writer.Write("ROM\tRegion\tYear\tDeveloper\tGenre\n");
