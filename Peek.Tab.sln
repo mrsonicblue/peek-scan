@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30907.101
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Peek.Tab", "Peek.Tab.csproj", "{52A27BA8-14B3-4E31-856D-B9F9E96FA4D6}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{52A27BA8-14B3-4E31-856D-B9F9E96FA4D6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{52A27BA8-14B3-4E31-856D-B9F9E96FA4D6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{52A27BA8-14B3-4E31-856D-B9F9E96FA4D6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{52A27BA8-14B3-4E31-856D-B9F9E96FA4D6}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {81C40030-CD47-4766-82D0-C6C2927BC5E9}
+	EndGlobalSection
+EndGlobal

@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "Peek.Tab": {
+      "commandName": "Project",
+      "commandLineArgs": "C:\\Users\\Eric\\Downloads\\openvgdb\\openvgdb.sqlite C:\\Users\\Eric\\Downloads\\roms C:\\Users\\Eric\\Downloads\\NES.txt"
+    }
+  }
+}
