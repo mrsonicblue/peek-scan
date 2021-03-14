@@ -15,13 +15,16 @@ namespace Peek.Tab
         {
             if (args.Length < 3)
             {
-                Console.WriteLine("Usage: Peek.Tab.exe [openvgdb path] [rom path] [output path]");
+                Console.WriteLine("Usage: Peek.Tab.exe [openvgdb path] [rom path] [output path] [rom header size]");
                 return;
             }
 
             string dbPath = args[0];
             string romsPath = args[1];
             string outputPath = args[2];
+            int headerSize;
+            if (args.Length <= 3 || !int.TryParse(args[3], out headerSize))
+                headerSize = 0;
 
             if (!File.Exists(dbPath))
             {
@@ -44,7 +47,7 @@ namespace Peek.Tab
 
             Console.WriteLine("Opening output file...");
 
-            using (var outputStream = File.Open(outputPath, FileMode.Truncate))
+            using (var outputStream = File.Open(outputPath, FileMode.Create))
             using (var writer = new StreamWriter(outputStream, Encoding.ASCII))
             {
                 writer.Write("ROM\tRegion\tYear\tDeveloper\tGenre\n");
@@ -77,23 +80,27 @@ namespace Peek.Tab
                             {
                                 foreach (var entry in zip.Entries)
                                 {
-                                    ext = Path.GetExtension(entry.Name)?.ToLower();
-                                    if (ext != ".nes")
-                                        continue;
+                                    //ext = Path.GetExtension(entry.Name)?.ToLower();
+                                    //if (ext != ".nes")
+                                    //    continue;
 
                                     using (var entryStream = entry.Open())
                                     {
-                                        entryStream.Read(header, 0, 16);
+                                        if (headerSize > 0)
+                                            entryStream.Read(header, 0, 16);
+
                                         hash = sha1.ComputeHash(entryStream);
                                     }
                                 }
                             }
                         }
-                        else if (ext == ".nes")
+                        else // if (ext == ".nes")
                         {
                             using (var fileStream = file.OpenRead())
                             {
-                                fileStream.Read(header, 0, 16);
+                                if (headerSize > 0)
+                                    fileStream.Read(header, 0, 16);
+
                                 hash = sha1.ComputeHash(fileStream);
                             }
                         }
