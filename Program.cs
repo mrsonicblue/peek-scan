@@ -7,7 +7,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
 
-namespace Peek.Tab
+namespace Peek.Scan
 {
     class Program
     {
@@ -15,7 +15,7 @@ namespace Peek.Tab
         {
             if (args.Length < 3)
             {
-                Console.WriteLine("Usage: Peek.Tab.exe [openvgdb path] [rom path] [output path] [rom header size]");
+                Console.WriteLine("Usage: Peek.Scan.exe [openvgdb path] [rom path] [output path] [rom header size]");
                 return;
             }
 
