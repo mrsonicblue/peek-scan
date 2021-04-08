@@ -5,7 +5,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 
-namespace Peek.Tab
+namespace Peek.Scan
 {
     public static class Extensions
     {
