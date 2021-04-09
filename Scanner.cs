@@ -66,6 +66,9 @@ namespace Peek.Scan
 
         private void Import(string coreName, string outputPath)
         {
+            if (string.IsNullOrEmpty(_peekPath))
+                return;
+
             using (var process = new Process())
             {
                 process.StartInfo = new ProcessStartInfo
