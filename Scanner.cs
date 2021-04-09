@@ -1,6 +1,7 @@
 ﻿using Microsoft.Data.Sqlite;
 using Microsoft.Extensions.Configuration;
 using System;
+using System.Diagnostics;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
@@ -15,6 +16,7 @@ namespace Peek.Scan
         private string _gamesPath;
         private string _dbPath;
         private string _outputPath;
+        private string _peekPath;
         private SHA1 _sha1;
         private DateTime _lastProgressDate;
         private int _lastProgressLength;
@@ -24,32 +26,34 @@ namespace Peek.Scan
             _gamesPath = config["GamesPath"];
             _dbPath = config["DbPath"];
             _outputPath = config["OutputPath"];
+            _peekPath = config["PeekPath"];
             _sha1 = SHA1.Create();
             _lastProgressDate = DateTime.MinValue;
             _lastProgressLength = 0;
         }
 
+        private void Progress(string coreName, int coreIndex, int coreCount, string step)
+        {
+            string message = $"\rCore: {coreName} ({coreIndex + 1} of {coreCount})... {step}";
+            int messageLength = message.Length;
+            if (messageLength < _lastProgressLength)
+                message += new string(' ', _lastProgressLength - messageLength);
+
+            Console.Write(message);
+
+            _lastProgressLength = message.Length;
+        }
+
         private void Progress(string coreName, int coreIndex, int coreCount, int romIndex, int romCount)
         {
             DateTime now = DateTime.Now;
-            if (romIndex == 0 || (now - _lastProgressDate).TotalMilliseconds > 250.0)
-            {
-                string roms;
-                if (romCount == 0)
-                    roms = "no roms found";
-                else
-                    roms = $"processed {romIndex} of {romCount} roms";
+            if ((now - _lastProgressDate).TotalMilliseconds < 250.0)
+                return;
 
-                string message = $"\rCore: {coreName} ({coreIndex + 1} of {coreCount})... {roms}";
-                int messageLength = message.Length;
-                if (messageLength < _lastProgressLength)
-                    message += new string(' ', _lastProgressLength - messageLength);
+            _lastProgressDate = now;
 
-                Console.Write(message);
-
-                _lastProgressDate = now;
-                _lastProgressLength = message.Length;
-            }
+            string step = $"processed {romIndex} of {romCount} roms";
+            Progress(coreName, coreIndex, coreCount, step);
         }
 
         private int RomHeaderSize(string coreName)
@@ -58,6 +62,25 @@ namespace Peek.Scan
                 return 16;
 
             return 0;
+        }
+
+        private void Import(string coreName, string outputPath)
+        {
+            using (var process = new Process())
+            {
+                process.StartInfo = new ProcessStartInfo
+                {
+                    FileName = _peekPath,
+                    ArgumentList = { "db", "import", coreName, outputPath },
+                    RedirectStandardOutput = true
+                };
+                process.Start();
+                while (process.StandardOutput.ReadLine() != null) { }
+                process.WaitForExit();
+
+                if (process.ExitCode != 0)
+                    throw new Exception($"Import process failed with code {process.ExitCode}");
+            }
         }
 
         private string GetHash(FileInfo file, int headerSize)
@@ -150,7 +173,7 @@ namespace Peek.Scan
                     int romCount = romFiles.Length;
                     int romIndex = 0;
 
-                    Progress(coreName, coreIndex, coreCount, romIndex, romCount);
+                    Progress(coreName, coreIndex, coreCount, "");
 
                     int headerSize = RomHeaderSize(coreName);
                     string outputPath = Path.Combine(_outputPath, coreName + ".txt");
@@ -202,6 +225,9 @@ namespace Peek.Scan
                             romIndex++;
                         }
                     }
+
+                    Progress(coreName, coreIndex, coreCount, "importing");
+                    Import(coreName, outputPath);
 
                     coreIndex++;
                 }
