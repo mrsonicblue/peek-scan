@@ -105,43 +105,49 @@ namespace Peek.Scan
 
         private string GetHash(FileInfo file, int headerSize)
         {
-            byte[] hash = null;
-            byte[] header = new byte[headerSize];
-
-            string ext = file.Extension?.ToLower();
-            if (ext == ".zip")
+            try
             {
-                using (var zip = ZipFile.Open(file.FullName, ZipArchiveMode.Read))
+                byte[] hash = null;
+                byte[] header = new byte[headerSize];
+
+                string ext = file.Extension?.ToLower();
+                if (ext == ".zip")
                 {
-                    foreach (var entry in zip.Entries)
+                    using (var zip = ZipFile.Open(file.FullName, ZipArchiveMode.Read))
                     {
-                        using (var entryStream = entry.Open())
+                        foreach (var entry in zip.Entries)
                         {
-                            if (headerSize > 0)
-                                entryStream.Read(header, 0, headerSize);
+                            using (var entryStream = entry.Open())
+                            {
+                                if (headerSize > 0)
+                                    entryStream.Read(header, 0, headerSize);
 
-                            hash = _sha1.ComputeHash(entryStream);
+                                hash = _sha1.ComputeHash(entryStream);
+                            }
+
+                            break;
                         }
-
-                        break;
                     }
                 }
-            }
-            else
-            {
-                using (var fileStream = file.OpenRead())
+                else
                 {
-                    if (headerSize > 0)
-                        fileStream.Read(header, 0, headerSize);
+                    using (var fileStream = file.OpenRead())
+                    {
+                        if (headerSize > 0)
+                            fileStream.Read(header, 0, headerSize);
 
-                    hash = _sha1.ComputeHash(fileStream);
+                        hash = _sha1.ComputeHash(fileStream);
+                    }
                 }
+
+                if (hash == null)
+                    return null;
+
+                return BitConverter.ToString(hash).Replace("-", "");
             }
+            catch { }
 
-            if (hash == null)
-                return null;
-
-            return BitConverter.ToString(hash).Replace("-", "");
+            return null;
         }
 
         public void Run()
