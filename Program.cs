@@ -14,10 +14,15 @@ namespace Peek.Scan
     {
         static void Main(string[] args)
         {
+            Console.WriteLine("Starting Peek scanner");
+
             var config = new ConfigurationBuilder()
                 .AddJsonFile("appsettings.json", optional: true)
                 .AddCommandLine(args)
                 .Build();
+
+            if (!new Setup(config).Run())
+                return;
 
             new Scanner(config).Run();
         }
