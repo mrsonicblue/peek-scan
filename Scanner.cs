@@ -19,6 +19,7 @@ namespace Peek.Scan
         private string _outputPath;
         private string _peekPath;
         private Dictionary<string, string> _coreWhitelist;
+        private Dictionary<string, string> _coreBlacklist;
         private SHA1 _sha1;
         private DateTime _lastProgressDate;
         private int _lastProgressLength;
@@ -29,14 +30,23 @@ namespace Peek.Scan
             _dbPath = config["DbPath"];
             _outputPath = config["OutputPath"];
             _peekPath = config["PeekPath"];
-
-            string[] coreWhiteList = (config["CoreWhiteList"] ?? "").Split(",").Select(o => o.Trim()).Where(o => o.Length > 0).ToArray();
-            if (coreWhiteList.Length > 0)
-                _coreWhitelist = coreWhiteList.ToDictionary(o => o);
-
+            _coreWhitelist = ParseList(config["CoreWhiteList"]);
+            _coreBlacklist = ParseList(config["CoreBlackList"]);
             _sha1 = SHA1.Create();
             _lastProgressDate = DateTime.MinValue;
             _lastProgressLength = 0;
+        }
+
+        private Dictionary<string, string> ParseList(string s)
+        {
+            if (s == null)
+                return null;
+
+            var a = s.Split(",").Select(o => o.Trim()).Where(o => o.Length > 0).ToArray();
+            if (a.Length == 0)
+                return null;
+
+            return a.ToDictionary(o => o);
         }
 
         private void Progress(string coreName, int coreIndex, int coreCount, string step)
@@ -168,10 +178,16 @@ namespace Peek.Scan
                 Console.WriteLine("Scanning...");
 
                 var gameDir = new DirectoryInfo(_gamesPath);
-                var coreDirs = gameDir.GetDirectories()
-                    .Where(o => !o.Name.StartsWith("."))
-                    .Where(o => _coreWhitelist == null || _coreWhitelist.ContainsKey(o.Name))
-                    .ToArray();
+                var coreQuery = gameDir.GetDirectories()
+                    .Where(o => !o.Name.StartsWith("."));
+
+                if (_coreWhitelist != null)
+                    coreQuery = coreQuery.Where(o => _coreWhitelist.ContainsKey(o.Name));
+
+                if (_coreBlacklist != null)
+                    coreQuery = coreQuery.Where(o => !_coreBlacklist.ContainsKey(o.Name));
+
+                var coreDirs = coreQuery.ToArray();
                 int coreCount = coreDirs.Length;
                 int coreIndex = 0;
                 foreach (var coreDir in coreDirs)
