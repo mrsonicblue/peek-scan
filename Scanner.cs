@@ -1,6 +1,7 @@
 ﻿using Microsoft.Data.Sqlite;
 using Microsoft.Extensions.Configuration;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.IO.Compression;
@@ -17,6 +18,7 @@ namespace Peek.Scan
         private string _dbPath;
         private string _outputPath;
         private string _peekPath;
+        private Dictionary<string, string> _coreWhitelist;
         private SHA1 _sha1;
         private DateTime _lastProgressDate;
         private int _lastProgressLength;
@@ -27,6 +29,11 @@ namespace Peek.Scan
             _dbPath = config["DbPath"];
             _outputPath = config["OutputPath"];
             _peekPath = config["PeekPath"];
+
+            string[] coreWhiteList = (config["CoreWhiteList"] ?? "").Split(",").Select(o => o.Trim()).Where(o => o.Length > 0).ToArray();
+            if (coreWhiteList.Length > 0)
+                _coreWhitelist = coreWhiteList.ToDictionary(o => o);
+
             _sha1 = SHA1.Create();
             _lastProgressDate = DateTime.MinValue;
             _lastProgressLength = 0;
@@ -160,12 +167,10 @@ namespace Peek.Scan
 
                 Console.WriteLine("Scanning...");
 
-                var coreWhitelist = new string[] { "NES", "SNES" };
-
                 var gameDir = new DirectoryInfo(_gamesPath);
                 var coreDirs = gameDir.GetDirectories()
                     .Where(o => !o.Name.StartsWith("."))
-                    .Where(o => coreWhitelist.Contains(o.Name))
+                    .Where(o => _coreWhitelist == null || _coreWhitelist.ContainsKey(o.Name))
                     .ToArray();
                 int coreCount = coreDirs.Length;
                 int coreIndex = 0;
@@ -189,10 +194,11 @@ namespace Peek.Scan
                         foreach (var romFile in romFiles)
                         {
                             Progress(coreName, coreIndex, coreCount, romIndex, romCount);
+                            romIndex++;
 
                             string hash = GetHash(romFile, headerSize);
                             if (hash == null)
-                                break;
+                                continue;
 
                             var rom = conn.Find<Rom>("SELECT romID, regionID FROM ROMs WHERE romHashSHA1 = $hash", p => { p["$hash"] = hash; });
                             if (rom == null)
@@ -224,8 +230,6 @@ namespace Peek.Scan
                             writer.Write("\t");
                             writer.Write(Clean(genre));
                             writer.Write("\n");
-
-                            romIndex++;
                         }
                     }
 
