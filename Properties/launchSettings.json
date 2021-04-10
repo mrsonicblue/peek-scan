@@ -1,28 +1,7 @@
 {
   "profiles": {
-    "ATARI2600": {
-      "commandName": "Project",
-      "commandLineArgs": "C:\\Users\\Eric\\Downloads\\openvgdb\\openvgdb.sqlite \\\\192.168.1.179\\fat\\games\\ATARI2600 \\\\192.168.1.179\\fat\\peek\\ATARI2600.txt"
-    },
-    "GAMEBOY": {
-      "commandName": "Project",
-      "commandLineArgs": "C:\\Users\\Eric\\Downloads\\openvgdb\\openvgdb.sqlite \\\\192.168.1.179\\fat\\games\\GAMEBOY \\\\192.168.1.179\\fat\\peek\\GAMEBOY.txt"
-    },
-    "GBA": {
-      "commandName": "Project",
-      "commandLineArgs": "C:\\Users\\Eric\\Downloads\\openvgdb\\openvgdb.sqlite \\\\192.168.1.179\\fat\\games\\GBA \\\\192.168.1.179\\fat\\peek\\GBA.txt"
-    },
-    "Genesis": {
-      "commandName": "Project",
-      "commandLineArgs": "C:\\Users\\Eric\\Downloads\\openvgdb\\openvgdb.sqlite \\\\192.168.1.179\\fat\\games\\Genesis \\\\192.168.1.179\\fat\\peek\\Genesis.txt"
-    },
-    "NES": {
-      "commandName": "Project",
-      "commandLineArgs": "C:\\Users\\Eric\\Downloads\\openvgdb\\openvgdb.sqlite \\\\192.168.1.179\\fat\\games\\NES \\\\192.168.1.179\\fat\\peek\\NES.txt 16"
-    },
-    "SNES": {
-      "commandName": "Project",
-      "commandLineArgs": "C:\\Users\\Eric\\Downloads\\openvgdb\\openvgdb.sqlite \\\\192.168.1.179\\fat\\games\\SNES \\\\192.168.1.179\\fat\\peek\\SNES.txt"
+    "Peek.Scan": {
+      "commandName": "Project"
     }
   }
 }
